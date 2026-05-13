@@ -1,0 +1,18 @@
+[project]
+name = "tag-mcp"
+version = "0.1.0"
+description = "Booru Tagging Model Context Protocol Server"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastmcp>=3.2.4",
+    "openai",
+]
+
+[build-system]
+requires = ["uv_build>=0.11.14,<0.12"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "tag_mcp"
+module-root = "src"
