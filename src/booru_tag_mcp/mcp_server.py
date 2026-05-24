@@ -1,9 +1,30 @@
 from fastmcp import FastMCP, utilities
+from starlette.middleware import Middleware
+from starlette.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
+
 from openai import OpenAI
 from argparse import ArgumentParser
 from importlib.resources import files
 import os
 import json
+
+# Configure CORS for browser-based clients
+middleware = [
+    Middleware(
+        CORSMiddleware,
+        allow_origins=["*"],  # Allow all origins; use specific origins for security
+        allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
+        allow_headers=[
+            "mcp-protocol-version",
+            "mcp-session-id",
+            "Authorization",
+            "Content-Type",
+        ],
+        expose_headers=["mcp-session-id"],
+    )
+]
+
 mcp = FastMCP("booru-tag-mcp")
 logger = utilities.logging.get_logger(__name__)
 
@@ -12,6 +33,7 @@ async def get_tag_groups(query:str) -> list[str] :
     tag_groups: list[str] = {}
     tag_group_dir = files("booru_tag_mcp").joinpath("tags")
     all_tag_groups = [t.stem for t in tag_group_dir.rglob("*.txt")]
+    logger.info(f"Trying host {os.environ.get('OPENAI_BASE_URL')} and key {os.environ.get('OPENAI_API_KEY')}")
     client = OpenAI(
         base_url = os.environ.get("OPENAI_BASE_URL"),
         api_key  = os.environ.get("OPENAI_API_KEY"),
@@ -83,12 +105,14 @@ async def get_tag(query:str, tag_group:str) -> list[str]:
     logger.info("tag output " + output)
     return [a.strip() for a in output.split(',')]
 
-def main(host:str, port:int) -> None:
-    mcp.run(transport="http", host=host, port=port)
-
-if __name__ == "__main__":
+def main():
     parser = ArgumentParser(description="Command line start for booru-tag-mcp")
     parser.add_argument("--port", default=3000, type=int, help="Port to listen on")
     parser.add_argument("--host", default="localhost", help="Host to listen on, localhost for local communication only, 0.0.0.0 or the IP address of the computer for external communication (or running in a Docker container)")
     args = parser.parse_args()
-    main(host=args.host, port=args.port)
+    load_dotenv()
+    mcp.run(transport="http", host=args.host, port=args.port, middleware=middleware)
+
+
+if __name__ == "__main__":
+    main()

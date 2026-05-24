@@ -1,6 +1,8 @@
 # Auto-generated files
 src/booru_tag_mcp/tag_pages/*.html
 src/booru_tag_mcp/tags/*.txt
+tag_pages/*.html
+tags/*.txt
 
 # Python-generated files
 __pycache__/

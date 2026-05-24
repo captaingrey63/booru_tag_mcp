@@ -5,6 +5,7 @@ description = "Booru Tagging Model Context Protocol Server"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "tqdm",
     "fastmcp>=3.2.4",
     "openai",
 ]
@@ -12,6 +13,10 @@ dependencies = [
 [build-system]
 requires = ["uv_build>=0.11.14,<0.12"]
 build-backend = "uv_build"
+
+[project.scripts]
+booru_get_tags = "booru_tag_mcp.get_tags:main"
+booru_mcp_server = "booru_tag_mcp.mcp_server:main"
 
 [tool.uv.build-backend]
 module-name = "booru_tag_mcp"
